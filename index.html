@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数字界域ABO｜算力分型趣味小游戏</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{background:#f3efeb;color:#444;padding:20px;max-width:600px;margin:0 auto}
+.page{display:none}
+.page.active{display:block}
+.card{background:#fff;padding:28px;border-radius:20px;margin-top:20px;box-shadow:0 4px 12px #00000008}
+h1{font-size:22px;text-align:center;margin-bottom:12px;color:#5c544f}
+.desc{text-align:center;color:#777;margin-bottom:24px;line-height:1.6;font-size:14px}
+.warn{background:#f1e9e3;padding:10px;border-radius:12px;font-size:13px;color:#66554b;margin-bottom:16px;line-height:1.5}
+.q-title{font-size:18px;margin-bottom:20px;line-height:1.5}
+.opt{display:block;width:100%;padding:14px 16px;margin:10px 0;border:1px solid #ddd;border-radius:14px;background:#fff;color:#444;text-align:left;font-size:16px;cursor:pointer}
+.opt:hover{border-color:#b8ada5;background:#f9f6f3}
+.opt.selected{border-color:#8c7c72;background:#f0e9e3}
+.btns{margin-top:24px;text-align:center}
+button{padding:13px 32px;border:none;border-radius:99px;background:#8c7c72;color:white;font-size:16px;cursor:pointer}
+button:disabled{background:#ccc;cursor:not-allowed}
+.res-title{font-size:22px;font-weight:bold;text-align:center;margin-bottom:16px}
+.res-info{padding:16px;background:#f7f2ee;border-radius:16px;line-height:1.7}
+.tag{display:inline-block;padding:4px 10px;background:#e8dfd8;border-radius:99px;margin:4px;font-size:14px}
+.lead{margin-top:20px;padding:14px;background:#f0e9e3;border-radius:14px;text-align:center;color:#5c544f;line-height:1.6}
+</style>
+</head>
+<body>
+<!-- 封面页 -->
+<div class="page active" id="start">
+<div class="card">
+<h1>数字界域ABO｜算力分型趣味小游戏</h1>
+<div class="warn">⚠️重要声明：本内容为架空同人脑洞趣味小游戏，仅供娱乐整活，不属于心理测评、学业测评、潜能测评、选科指导工具。结果无任何科学参考价值，不能作为选科、学习规划、判断学习能力的依据，学习成绩取决于个人努力、学习方法。本游戏和任何学校、教育机构、考试官方无关联。</div>
+<p class="desc">解锁你的分型、专属信息素<br>一共15题</p >
+<div class="btns">
+<button onclick="startQuiz()">开始测试</button>
+</div>
+</div>
+</div>
+
+<!-- 答题页 -->
+<div class="page" id="quiz">
+<div class="card">
+<p style="text-align:right;color:#999">第 <span id="cur">1</span>/15 题</p >
+<p class="q-title" id="qtext"></p >
+<div id="opts"></div>
+<div class="btns">
+<button id="nextBtn" disabled onclick="next()">下一题</button>
+</div>
+</div>
+</div>
+
+<!-- 结果页 -->
+<div class="page" id="result">
+<div class="card">
+<div class="res-title" id="rname"></div>
+<div class="res-info" id="rtext"></div>
+<!-- 通用引流区域，不绑定学科 -->
+<div class="lead">
+喜欢这类脑洞测试、人设内容的朋友，可以扫码进圈子，领取更多趣味测试
+</div>
+<div class="warn" style="margin-top:16px">⚠️再次提醒：仅娱乐玩梗，结果不具备现实参考意义</div>
+<div class="btns" style="margin-top:20px">
+<button onclick="restart()">重新测试</button>
+</div>
+</div>
+</div>
+
+<script>
+const questions = [
+{q:"开启一个新项目，你优先押注？",o:["底层框架基建","核心模型内核","信息流应用","远期前沿猜想"],s:[0,1,2,3]},
+{q:"合作的同伴损害你的利益，你的第一反应？",o:["直接切割，终止协作","核算得失，重新评估关系","悄悄收集线索缓慢布局","降低期待，维持最低限度协作"],s:[0,1,2,3]},
+{q:"你怎么看待未知风险？",o:["风险就是机会，值得重仓","风险必须量化，算清赔率再出手","优先规避风险，稳步迭代","享受未知里藏着的新信号"],s:[0,1,2,3]},
+{q:"做重大选择，优先参考？",o:["数据回报","这件事本身的想象空间","规则是否公平","自己能不能稳稳落地掌控"],s:[0,1,2,3]},
+{q:"对手用灰色方式超车，你会？",o:["同赛道正面竞争","专注自己路线，不跟随内卷","收集线索等待时机","觉得对局无趣，减少投入"],s:[0,1,2,3]},
+{q:"你更擅长？",o:["搭建底层秩序","在现有秩序拿到结果","发掘别人看不见的新方向","持续迭代打磨体系"],s:[0,1,2,3]},
+{q:"如果在这个数字界域获得很高知名度，你更想？",o:["站在前方引领方向","藏在幕后掌控节奏","减少社交专注探索","维持低调稳定运行"],s:[0,1,2,3]},
+{q:"一个想法还没有任何数据支撑，你会？",o:["直接投入试错","等待数据验证再投入","慢慢打磨细节","先记录存档，等待时机"],s:[0,1,2,3]},
+{q:"团队出现巨大意见分歧时，你习惯？",o:["直接拍板定方向","收集多方信息权衡取舍","寻找全新第三条路线","稳住局面，避免冲突"],s:[0,1,2,3]},
+{q:"一件事投入很久看不到正向反馈，你？",o:["继续加码，相信周期","设止损线，及时收手","换视角寻找突破口","慢慢转移重心"],s:[0,1,2,3]},
+{q:"别人强烈质疑你的方向，你？",o:["用最终结果证明","拿出逻辑冷静辩论","默认对方看不懂，懒得解释","微调方案降低争议"],s:[0,1,2,3]},
+{q:"你更适合和哪一类搭档协作？",o:["敢冲敢试的执行者","理性算账的评估者","脑洞超前的猜想者","稳妥不出错的守局人"],s:[0,1,2,3]},
+{q:"拿到一笔可观资源，优先？",o:["投入新赛道试错","稳健分配，分散风险","投入前沿未知探索","加固现有体系"],s:[0,1,2,3]},
+{q:"下面哪种困境最让你难受？",o:["没有下注的机会","信息太少无法判断","无休止重复枯燥迭代","被繁杂的利益捆绑"],s:[0,1,2,3]},
+{q:"对于资源变现这件事，你的态度？",o:["变现是落地的工具","变现是核心标尺","过度变现会损耗创意","循序渐进长线变现"],s:[0,1,2,3]}
+];
+const results = [
+{name:"🧩岩基构筑者｜Alpha · 雪松岩息",txt:"<span class='tag'>Alpha</span> <span class='tag'>信息素：雪松岩息</span><br/>厚重沉稳的基建型Alpha。愿意长期重仓底层框架，扛得住漫长冷清的周期，敢在所有人观望的时候all in长线布局。威慑来自扎实的沉淀，不靠话术压迫别人。<br/><br/>✅优势：搭建底层框架、长期布局、扛周期<br/>⚠️短板：赛道判断失误时沉没成本极高，很难及时抽身止损"},
+{name:"🧩流序校准者｜Beta · 冷调白茶",txt:"<span class='tag'>Beta</span> <span class='tag'>信息素：冷调白茶</span><br/>气味清淡克制，没有强烈压迫感，是洪流里顶级的迭代校准Beta。情绪阈值很高，不容易被舆论、一时输赢打乱节奏，擅长捕捉人群与信息流的隐秘走向，持续打磨优化规则。<br/><br/>✅优势：反馈迭代、趋势捕捉、稳定续航<br/>⚠️短板：很难燃起不计代价的狂热，面对完全空白未知赛道容易犹豫"},
+{name:"🧩星火拓路者｜Alpha · 苦柑橘炭",txt:"<span class='tag'>Alpha</span> <span class='tag'>信息素：苦柑橘炭</span><br/>野心与冒险感并存的开拓Alpha，擅长撬动资源、拥抱巨大的不确定性，主动奔赴还没有成型的新赛道，愿意为颠覆性的可能性下注。<br/><br/>✅优势：资源联动、开辟新赛道、推动变革<br/>⚠️短板：想法容易摇摆，在理想和现实拉扯内耗"},
+{name:"🧩墨核深耕者｜Beta · 清苦墨香",txt:"<span class='tag'>Beta</span> <span class='tag'>信息素：清苦墨香</span><br/>安静内敛的技术Beta，沉心钻研内核本身，不喜喧嚣炒作，追求可控、扎实、可验证的结果，默默打磨核心能力。<br/><br/>✅优势：深度攻坚、稳定输出、专注内核<br/>⚠️短板：不擅长对外博弈、造势谈判"},
+{name:"🧩雾域感知者｜Omega · 雨后松雾",txt:"<span class='tag'>Omega</span> <span class='tag'>信息素：雨后松雾</span><br/>不是柔弱刻板Omega，是高感知洞察型。对未知信号极度敏感，能捕捉别人忽略的潜在可能性，想法常常具备颠覆性，攻击性很低，偏向向内探索。<br/><br/>✅优势：灵感预判、前沿猜想、捕捉隐性信号<br/>⚠️短板：繁琐的利益博弈、世俗交易非常消耗你"},
+{name:"🧩网结编织者｜Alpha · 冷金属臭氧",txt:"<span class='tag'>Alpha</span> <span class='tag'>信息素：冷金属臭氧</span><br/>理性冷静的联结Alpha，目标感极强，擅长编织庞大的网络与链接体系，看重节点之间的联动，耐力极强，可以长期咬住一条路线持续推进。<br/><br/>✅优势：网络搭建、节点联动、长期坚持<br/>⚠️短板：容易忽略人情与隐性情绪风险"}
+];
+let cur=0,score=[0,0,0,0],sel=null;
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function startQuiz(){cur=0;score=[0,0,0,0];renderQ();showPage("quiz")}
+function renderQ(){sel=null;const q=questions[cur];document.getElementById("cur").innerText=cur+1;document.getElementById("qtext").innerText=q.q;const odiv=document.getElementById("opts");odiv.innerHTML="";q.o.forEach((t,i)=>{const b=document.createElement("button");b.className="opt";b.innerText=t;b.onclick=()=>{sel=i;document.querySelectorAll(".opt").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");document.getElementById("nextBtn").disabled=false};odiv.appendChild(b)})
+document.getElementById("nextBtn").disabled=true;}
+function next(){
+score[questions[cur].s[sel]]++;cur++;
+if(cur>=questions.length){showResult()}else{renderQ()}
+}
+function showResult(){
+let max=0,idx=0;
+for(let i=0;i<4;i++)if(score[i]>max){max=score[i];idx=i}
+if(idx===0)idx=0;
+else if(idx===1)idx=1;
+else if(idx===2)idx=2;
+else idx=Math.random()>0.5?3:4;
+if(score[1]===score[2]&&score[0]==0)idx=5;
+const r=results[idx];
+document.getElementById("rname").innerText=r.name;
+document.getElementById("rtext").innerHTML=r.txt;
+showPage("result");
+}
+function restart(){cur=0;score=[0,0,0,0];showPage("start")}
+</script>
+</body>
+</html>
